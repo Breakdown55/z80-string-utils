@@ -1,0 +1,99 @@
+        .org 0x8000
+
+start:
+        ld ix, 0               ; Error counter
+
+
+        ; Test 1: Normal string
+        ld hl, test_string1
+        ld de, buffer1
+        call _strcpy
+
+        ld hl, buffer1
+        ld de, test_string1
+        call _streq
+
+        jr z, .test1_passed
+        inc ix
+
+.test1_passed:
+
+        ; Test 2: Empty string
+        ld hl, test_string2
+        ld de, buffer2
+        call _strcpy
+
+        ld hl, buffer2
+        ld de, test_string2
+        call _streq
+
+        jr z, .test2_passed
+        inc ix
+
+.test2_passed:
+
+        ; Test 3: Single character
+        ld hl, test_string3
+        ld de, buffer3
+        call _strcpy
+
+        ld hl, buffer3
+        ld de, test_string3
+        call _streq
+
+        jr z, .test3_passed
+        inc ix
+
+.test3_passed:
+
+        ; Test 4: String with spaces
+        ld hl, test_string4
+        ld de, buffer4
+        call _strcpy
+
+        ld hl, buffer4
+        ld de, test_string4
+        call _streq
+
+        jr z, .test4_passed
+        inc ix
+
+.test4_passed:
+
+        ; Test 5: Overwrite existing data
+        ld hl, test_string5
+        ld de, buffer5
+        call _strcpy
+
+        ld hl, buffer5
+        ld de, test_string5
+        call _streq
+
+        jr z, .test5_passed
+        inc ix
+
+.test5_passed:
+        push ix
+        pop bc
+        ld a, c
+        halt
+
+
+
+
+
+        .org 0x9000
+
+test_string1: .asciz "Hello"
+test_string2: .asciz ""
+test_string3: .asciz "A"
+test_string4: .asciz "Hello World"
+test_string5: .asciz "Hi"
+
+buffer1: .ds 32, 0
+buffer2: .ds 32, 1
+buffer3: .ds 32, 0
+buffer4: .ds 32, 0
+buffer5: .asciz "Longer old data"
+
+#include "functions.z80"

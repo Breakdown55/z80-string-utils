@@ -1,0 +1,110 @@
+        .org 0x8000
+
+start:
+        ld ix, 0               ; Error counter
+
+
+        ; Test 1: Normal concatenation
+        ld hl, buffer1
+        ld de, source1
+        call _strcat
+
+        ld hl, buffer1
+        ld de, expected1
+        call _streq
+
+        jr z, .test1_passed
+        inc ix
+
+.test1_passed:
+
+        ; Test 2: Empty source
+        ld hl, buffer2
+        ld de, source2
+        call _strcat
+
+        ld hl, buffer2
+        ld de, expected2
+        call _streq
+
+        jr z, .test2_passed
+        inc ix
+
+.test2_passed:
+
+        ; Test 3: Empty destination
+        ld hl, buffer3
+        ld de, source3
+        call _strcat
+
+        ld hl, buffer3
+        ld de, expected3
+        call _streq
+
+        jr z, .test3_passed
+        inc ix
+
+.test3_passed:
+
+        ; Test 4: Single characters
+        ld hl, buffer4
+        ld de, source4
+        call _strcat
+
+        ld hl, buffer4
+        ld de, expected4
+        call _streq
+
+        jr z, .test4_passed
+        inc ix
+
+.test4_passed:
+
+        ; Test 5: String with spaces
+        ld hl, buffer5
+        ld de, source5
+        call _strcat
+
+        ld hl, buffer5
+        ld de, expected5
+        call _streq
+
+        jr z, .test5_passed
+        inc ix
+
+.test5_passed:
+        push ix
+        pop bc
+        ld a, c
+        halt
+
+
+
+
+
+        .org 0x9000
+
+buffer1: .asciz "Hello"
+         .ds 32, 0
+buffer2: .asciz "Hello"
+         .ds 32, 0
+buffer3: .asciz ""
+         .ds 32, 0
+buffer4: .asciz "A"
+         .ds 32, 0
+buffer5: .asciz "Hello"
+         .ds 32, 0
+
+source1: .asciz "World"
+source2: .asciz ""
+source3: .asciz "World"
+source4: .asciz "B"
+source5: .asciz " World"
+
+expected1: .asciz "HelloWorld"
+expected2: .asciz "Hello"
+expected3: .asciz "World"
+expected4: .asciz "AB"
+expected5: .asciz "Hello World"
+
+#include "functions.z80"

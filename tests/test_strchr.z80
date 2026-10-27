@@ -1,0 +1,90 @@
+        .org 0x8000
+
+start:
+        ld ix, 0               ; Error counter
+
+
+        ; Test 1: First character
+        ld hl, test_string1
+        ld a, 'h'
+        call _strchr
+
+        jr nz, .test1_failed
+        cp 0                   ; Expected index: 0
+        jr z, .test1_passed
+
+.test1_failed:
+        inc ix
+
+.test1_passed:
+
+        ; Test 2: Middle character
+        ld hl, test_string1
+        ld a, 'l'
+        call _strchr
+
+        jr nz, .test2_failed
+        cp 2                   ; Expected index: 2
+        jr z, .test2_passed
+
+.test2_failed:
+        inc ix
+
+.test2_passed:
+
+        ; Test 3: Last character
+        ld hl, test_string1
+        ld a, 'o'
+        call _strchr
+
+        jr nz, .test3_failed
+        cp 4                   ; Expected index: 4
+        jr z, .test3_passed
+
+.test3_failed:
+        inc ix
+
+.test3_passed:
+
+        ; Test 4: Character not found
+        ld hl, test_string1
+        ld a, 'z'
+        call _strchr
+
+        jr z, .test4_failed
+        cp 5                   ; Expected length: 5
+        jr z, .test4_passed
+
+.test4_failed:
+        inc ix
+
+.test4_passed:
+
+        ; Test 5: Empty string, character not found
+        ld hl, test_string2
+        ld a, 'z'
+        call _strchr
+
+        jr z, .test5_failed
+        cp 0                   ; Expected length: 0
+        jr z, .test5_passed
+
+.test5_failed:
+        inc ix
+
+.test5_passed:
+        push ix
+        pop bc
+        ld a, c
+        halt
+
+
+
+
+
+        .org 0x9000
+
+test_string1: .asciz "hello"
+test_string2: .asciz ""
+
+#include "functions.z80"

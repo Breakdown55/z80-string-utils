@@ -1,0 +1,73 @@
+        .org 0x8000
+
+start:
+        ld ix, 0               ; Error counter
+
+
+        ; Test 1: Normal string
+        ld hl, test_string1
+        call _strlen
+
+        cp 5                   ; Expected: 5
+        jr z, .test1_passed
+        inc ix
+
+.test1_passed:
+
+        ; Test 2: Empty string
+        ld hl, test_string2
+        call _strlen
+
+        cp 0                   ; Expected: 0
+        jr z, .test2_passed
+        inc ix
+
+.test2_passed:
+
+        ; Test 3: Single character
+        ld hl, test_string3
+        call _strlen
+
+        cp 1                   ; Expected: 1
+        jr z, .test3_passed
+        inc ix
+
+.test3_passed:
+
+        ; Test 4: Longer string
+        ld hl, test_string4
+        call _strlen
+
+        cp 10                  ; Expected: 10
+        jr z, .test4_passed
+        inc ix
+
+.test4_passed:
+
+        ; Test 5: String with spaces
+        ld hl, test_string5
+        call _strlen
+
+        cp 11                  ; Expected: 11
+        jr z, .test5_passed
+        inc ix
+
+.test5_passed:
+        push ix
+        pop bc
+        ld a, c                ; A = number of failed tests
+        halt
+
+
+
+
+
+        .org 0x9000
+
+test_string1: .asciz "Hello"
+test_string2: .asciz ""
+test_string3: .asciz "A"
+test_string4: .asciz "0123456789"
+test_string5: .asciz "Hello World"
+
+#include "functions.z80"
