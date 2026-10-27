@@ -1,0 +1,188 @@
+; ######################################
+; _strlen
+;
+; Returns the number of chars in
+; a string before a null-terminating character
+;
+; INPUT:
+;       hl = index of the string's first character
+;
+; OUTPUT:
+;       a = Returns the number of chars in the string
+;
+; CLOBBERS:
+;       AF, BC, DE, HL
+; ######################################
+_strlen:
+        xor a
+        ld de, hl
+
+        ld bc, 0                        ; allows for bc decrements
+        cpir                            ; increment hl, compare (hl) to a, decrement bc
+
+        scf                             ; \0 is included in count, so set carry flag for sbc
+        sbc hl, de                      ; ending ptr - starting ptr - 1 = len
+
+        ld a, l
+        ret
+
+
+
+; ######################################
+; _strcpy
+;
+; Copies the string beginning at hl
+; to de until hl reaches \0
+;
+; INPUT:
+;       hl = index of the null-terminated source string's first character
+;       de = index of the destination string's first character
+;
+;
+; CLOBBERS:
+;       AF, BC, DE, HL
+; ######################################
+_strcpy:
+        ld a, (hl)
+
+        ldi 
+
+        or a
+        ret z
+        
+        jr _strcpy
+
+        
+
+; ######################################
+; _streq
+;
+; Compares the string beginning at
+; the position pointed to by hl
+; with the string beginning at the
+; position pointed to be de
+;
+; INPUT:
+;       hl = index of a null-terminated string's first character
+;       de = index of a null-terminated string's first character
+;
+; OUTPUT:
+;       UNEQUAL:
+;               a = 1, Z = 0
+;       EQUAL:
+;               a = 0, Z = 1
+;
+; CLOBBERS:
+;       AF, BC, DE, HL
+; ######################################
+_streq:
+
+        ld a, (de)
+        or 0
+
+        jr z, ._streq_zero_found
+        
+        cpi
+        inc de
+        jr z, _streq
+
+._streq_unequal:
+        xor a
+        inc a
+        ret
+
+._streq_zero_found:
+        cp (hl)
+        jr nz, ._streq_unequal
+
+        xor a
+        ret
+
+
+
+
+; ######################################
+; _strcat
+;
+; Concatanates the string pointed at
+; by de to the end of the string pointed
+; at by hl
+;
+; INPUT:
+;       hl = index of first string's first character
+;       de = index of second string's first character
+;
+;
+; CLOBBERS:
+;       AF, BC, DE, HL
+; ######################################
+_strcat:
+        xor a
+
+        ld bc, 0                        ; allow for cpir bc decrements
+        cpir                            ; hl contains the index of one byte past string 1's \0 (incs regardless)
+        dec hl                          ; move hl to str 1's \0 to overwrite
+        ex de, hl                       ; de contains the index of string 1's \0, hl is at the start of str2 so we can use ldi
+
+._strcat_copy
+        ld a, (hl)
+        
+        ldi  
+
+        or a
+        ret z
+
+        jr ._strcat_copy
+
+
+        
+
+        
+
+; ######################################
+; _strchr
+;
+; Returns, in a, the index of the first
+; occurance of the ascii value stored
+; in a within the string pointed to
+; by hl
+;
+; INPUT:
+;       a = ascii value of character
+;       hl = index of string's first character
+;
+; OUTPUT:
+;       FOUND:
+;               a = index of character in string, z = 1
+;       NOT FOUND:
+;               a = length of string, z = 0
+; CLOBBERS:
+;       AF, B, DE, HL
+; ######################################
+_strchr:
+        ld de, hl                       ; starting position
+        ld b, a                         ; b contains char we are searching for
+
+._strchr_iterate:
+        ld a, (hl)
+        or a
+        jr z, ._strchr_not_found        ; found \0, meaning we didn't find the target char
+
+        cp b
+        jr z, ._strchr_found            ; found a value that matches our saved target char in b
+
+        inc hl
+        jr ._strchr_iterate
+        
+._strchr_found:
+        sbc hl, de                      ; distance between starting hl and ending hl = str len
+        ld a, l
+
+        cp a                            ; z flag to 1
+
+        ret
+
+._strchr_not_found:
+        sbc hl, de
+        ld a, l
+        ret

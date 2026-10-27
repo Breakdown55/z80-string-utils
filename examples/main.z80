@@ -1,0 +1,23 @@
+; Example usage of the Z80 String Library
+; Demonstrates _strlen and _strcpy
+
+        .org 0x8000
+
+start:
+        ; Get the length of "Hello"
+        ld hl, message
+        call _strlen
+
+        ; Copy "Hello" into buffer
+        ld hl, message
+        ld de, buffer
+        call _strcpy
+
+        halt
+
+        .org 0x9000
+
+message: .asciz "Hello"
+buffer:  .ds 32, 0
+
+#include "functions.z80"
